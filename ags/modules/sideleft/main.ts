@@ -3,7 +3,7 @@ import Gtk from "gi://Gtk?version=3.0";
 import { MaterialIcon } from "icons.ts";
 import { WeatherBox } from "./weather.ts";
 import { Media } from "./players.ts";
-import { Applauncher } from "./applauncher.ts";
+import { Applauncher, reloadApplications } from "./applauncher.ts";
 import { geminiPage } from "./gemini.ts";
 import { chatsPage } from "./chats.ts";
 
@@ -27,6 +27,7 @@ export function toggleMediaWindow() {
 
 globalThis.toggleMediaWindow = toggleMediaWindow;
 globalThis.toggleAppsWindow = toggleAppsWindow;
+globalThis.reloadApplications = reloadApplications;
 
 type ButtonType = {
     page: string;

@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Install
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = Updating applauncher list...
+When = PostTransaction
+Depends = aylurs-gtk-shell
+Exec = /bin/bash -c 'if pgrep -x "ags" > /dev/null; then sudo -u $(/usr/bin/logname) DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u $(/usr/bin/logname))/bus /usr/bin/ags -r "reloadApplications()"; fi > /dev/null'

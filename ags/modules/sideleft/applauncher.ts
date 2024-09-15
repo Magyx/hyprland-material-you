@@ -1,4 +1,4 @@
-const { query } = await Service.import("applications");
+const { query, reload } = await Service.import("applications");
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const Gio = imports.gi.Gio;
@@ -100,13 +100,23 @@ function AppItem(app: Application): Box<any, any> {
     });
 }
 
+let applications: Box<any, any>[];
+const list = Widget.Box({
+    vertical: true
+});
+
+function repopulate() {
+    applications = query("").map(AppItem);
+    applications = sortApplicationsByLaunchCount(applications);
+    list.children = applications;
+}
+
+export function reloadApplications() {
+    reload();
+    repopulate();
+}
+
 export const Applauncher = () => {
-    let applications: Box<any, any>[];
-
-    const list = Widget.Box({
-        vertical: true
-    });
-
     const entry = Widget.Entry({
         hexpand: true,
         class_name: "applauncher_entry",
@@ -126,11 +136,6 @@ export const Applauncher = () => {
             })
     });
 
-    function repopulate() {
-        applications = query("").map(AppItem);
-        applications = sortApplicationsByLaunchCount(applications);
-        list.children = applications;
-    }
     repopulate();
 
     return Widget.Box({
