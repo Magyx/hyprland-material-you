@@ -1,22 +1,13 @@
 import Gtk from "gi://Gtk?version=3.0";
 import popupwindow from "modules/misc/popupwindow";
 import { MaterialIcon } from "icons";
-const hyprland = await Service.import("hyprland");
+import FlowBox from "types/widgets/flowbox";
 
 const WINDOW_NAME = "cheatsheet";
 
 const load_keybindings_cmd = `python -OOO ${App.configDir}/scripts/keybindings.py`;
 let _keybindings = Utils.exec(load_keybindings_cmd);
 const keybindings = Variable(JSON.parse(_keybindings));
-
-// hyprland.connect("event", (hyprland, name) => {
-//     if (name == "configreloaded") {
-//         print(name)
-//         Utils.execAsync(load_keybindings_cmd).then((out) => {
-//             keybindings.setValue(JSON.parse(out));
-//         });
-//     }
-// })
 
 const icons = {
     super: ""
@@ -40,7 +31,7 @@ const category_icons = {
 const CheatSheet = () =>
     Widget.FlowBox({
         attribute: {
-            set: (self) => {
+            set: (self: FlowBox<any>) => {
                 for (let category in keybindings.value) {
                     const box = Widget.Box({
                         class_name: "category",
@@ -149,4 +140,35 @@ export const cheatsheet = popupwindow({
     keymode: "exclusive",
     child: CheatSheet(),
     anchor: []
+});
+
+const hyprland = await Service.import("hyprland");
+
+const setVisibleRecursively = (widget: Gtk.Widget) => {
+    widget.show();
+    if ((widget as Gtk.Container).get_children) {
+        (widget as Gtk.Container).get_children().forEach(child => setVisibleRecursively(child));
+    }
+};
+
+hyprland.connect("event", (_, name) => {
+    if (name == "configreloaded") {
+        Utils.execAsync(load_keybindings_cmd)
+            .then((out) => {
+                keybindings.setValue(JSON.parse(out));
+
+                if (cheatsheet.child) {
+                    cheatsheet.child.destroy();
+                }
+                const newCheatSheet = CheatSheet();
+                cheatsheet.add(newCheatSheet);
+
+                if (cheatsheet.visible) {
+                    cheatsheet.show_all();
+                } else {
+                    setVisibleRecursively(newCheatSheet);
+                }
+            })
+            .catch(error => print(error));
+    }
 });
