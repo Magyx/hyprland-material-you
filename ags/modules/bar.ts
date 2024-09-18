@@ -9,7 +9,7 @@ const { GLib, Gio } = imports.gi;
 const decoder = new TextDecoder();
 import { OpenSettings } from "apps/settings/main.ts";
 import { enable_click_through } from "./misc/clickthrough.js";
-import { RoundedCorner } from "./misc/cairo_roundedcorner.js";
+import { GetHyprOptions, RoundedCorner } from "./misc/cairo_roundedcorner.js";
 import { Client } from "types/service/hyprland.js";
 import Button from "types/widgets/button.js";
 import Icon from "types/widgets/icon.js";
@@ -18,8 +18,9 @@ import { MaterialIcon } from "icons.js";
 import config from "services/configuration.ts";
 import { toggleAppsWindow, toggleMediaWindow } from "./sideleft/main.js";
 import { Variable as VariableType } from "types/variable";
-
 import Gtk from "gi://Gtk?version=3.0";
+import Window from "types/widgets/window.js";
+import DrawingArea from "types/widgets/drawingarea.js";
 
 const keyboard_layout = Variable("none");
 hyprland.connect("keyboard-layout", (hyprland, keyboardname, layoutname) => {
@@ -540,8 +541,27 @@ export const Bar = async (monitor = 0) => {
     });
 };
 
-export const BarCornerTopLeft = (monitor = 0) =>
-    Widget.Window({
+let cornerWidgets: { [monitor: number]: { [place: string]: Window<DrawingArea<any>, any> } } = {};
+const storeCornerWidget = (monitor: number, place: string, widget: Window<DrawingArea<any>, any>) => {
+    if (!cornerWidgets[monitor]) {
+        cornerWidgets[monitor] = {};
+    }
+    cornerWidgets[monitor][place] = widget;
+}
+const updateCornerWidgets = (r: number) => {
+    for (const monitor in cornerWidgets) {
+        for (const place in cornerWidgets[monitor]) {
+            const widget = cornerWidgets[monitor][place];
+            if (!widget) continue;
+
+            widget.child = RoundedCorner(place, { className: "corner" })
+            widget.show_all();
+        }
+    }
+}
+
+export const BarCornerTopLeft = (monitor = 0) => {
+    const widget = Widget.Window({
         monitor,
         name: `bar_corner_tl${monitor}`,
         class_name: "transparent",
@@ -553,8 +573,12 @@ export const BarCornerTopLeft = (monitor = 0) =>
         setup: enable_click_through
     });
 
-export const BarCornerTopRight = (monitor = 0) =>
-    Widget.Window({
+    storeCornerWidget(monitor, "top_left", widget);
+    return widget;
+}
+
+export const BarCornerTopRight = (monitor = 0) => {
+    const widget = Widget.Window({
         monitor,
         name: `bar_corner_tr${monitor}`,
         class_name: "transparent",
@@ -565,3 +589,15 @@ export const BarCornerTopRight = (monitor = 0) =>
         child: RoundedCorner("top_right", { className: "corner" }),
         setup: enable_click_through
     });
+
+    storeCornerWidget(monitor, "top_right", widget);
+    return widget;
+}
+
+hyprland.connect("event", (_, name) => {
+    if (name === "configreloaded") {
+        const r = GetHyprOptions();
+        print("Updating r: " + r);
+        updateCornerWidgets(r);
+    }
+})
