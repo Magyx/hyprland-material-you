@@ -413,7 +413,12 @@ function TaskBar() {
         globalWidgets = globalWidgets.filter((widget) => currentClientIds.includes(widget.attribute.pid));
 
         clients.forEach((client) => {
-            if (client.class === "Alacritty") return;
+            const terminal = GLib.getenv("TERMINAL");
+            if (terminal && (client.class === terminal || client.class === terminal.split(' ')
+                .map(w => w[0].toUpperCase() + w.substring(1).toLowerCase())
+                .join(' '))) return;
+
+            if (client.class.startsWith("scratch")) return;
 
             let widget = globalWidgets.find((w) => w.attribute.pid === client.pid);
             if (widget) {
@@ -503,7 +508,7 @@ function Left() {
         class_name: "modules-left",
         hpack: "start",
         spacing: 8,
-        children: [AppLauncher(), OpenSideLeft(), MediaPlayer(), TaskBar()]
+        children: [AppLauncher(), MediaPlayer(), TaskBar()]
     });
 }
 
