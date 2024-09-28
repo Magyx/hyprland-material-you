@@ -73,9 +73,9 @@ install_packages() {
         hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
         xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
         xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
-        adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
-        sddm-theme-corners-git nm-connection-editor network-manager-applet \
-        networkmanager gnome-bluetooth-3.0 wl-gammarelay-rs bluez bluez-libs bluez-utils \
+        adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow \
+        greetd nm-connection-editor network-manager-applet networkmanager \
+        gnome-bluetooth-3.0 wl-gammarelay-rs bluez bluez-libs bluez-utils \
         cliphist wl-clipboard libadwaita swappy nwg-look \
         pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
         blueman fastfetch bibata-cursor-theme gum python-pywayland dbus \
@@ -175,15 +175,21 @@ setup_colors() {
     python -O $HOME/dotfiles/material-colors/generate.py --color "#0000FF"
 }
 
-setup_sddm() {
-    echo ":: Setting SDDM"
-    sudo mkdir -p /etc/sddm.conf.d
-    sudo cp $HOME/dotfiles/sddm/sddm.conf /etc/sddm.conf.d/
-    sudo cp $HOME/dotfiles/sddm/sddm.conf /etc/
-    sudo chmod 777 /etc/sddm.conf.d/sddm.conf
-    sudo chmod 777 /etc/sddm.conf
-    sudo chmod -R 777 /usr/share/sddm/themes/corners/
-    "$HOME"/dotfiles/sddm/scripts/wallpaper.sh
+setup_greetd() {
+    echo ":: Setting up greetd"
+    echo -e "\
+    [terminal]\n\
+    vt = 1\n\
+    \n\
+    [default_session]\n\
+    command = \"Hyprland\"\n\
+    user = \"$USER\"\n\
+    \n\
+    [initial_session]\n\
+    command = \"Hyprland\"\n\
+    user = \"$USER\"\n\
+    " | sudo tee /etc/greetd/config.toml > /dev/null
+    ln -s $HOME/dotfiles/greetd/ /etc/greetd
 }
 
 copy_files() {
@@ -271,7 +277,6 @@ main() {
     ask_continue "Proceed with checking config folders?*" && check_config_folders
     ask_continue "Proceed with installing icon themes?" false && install_icon_theme
     ask_continue "Proceed with setting up colors?*" && setup_colors
-    ask_continue "Proceed with setting up SDDM?" false && setup_sddm
     ask_continue "Proceed with copying files?*" && copy_files
     ask_continue "Proceed with creating links?*" && create_links
     ask_continue "Proceed with installing Vencord?" false && install_vencord
