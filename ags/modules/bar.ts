@@ -114,7 +114,13 @@ function Workspaces() {
     }
 
     function initializeWorkspaceButtons() {
-        for (let i = 1; i <= 10; i++) {
+        disposeWorkspaceButtons(); // Dispose existing buttons before reinitializing
+
+        const workspaceIds = hyprland.workspaces.map(workspace => workspace.id);
+        const minId = 1;
+        const maxId = Math.max(...workspaceIds);
+
+        for (let i = minId; i <= maxId; i++) {
             workspace_buttons.set(i, createWorkspaceButton(i));
         }
         workspace_buttons_array.setValue(Array.from(workspace_buttons.values()));
@@ -133,10 +139,18 @@ function Workspaces() {
         });
     }
 
+    function disposeWorkspaceButtons() {
+        workspace_buttons.forEach((button) => {
+            button.destroy();
+        });
+        workspace_buttons.clear();
+    }
+
     initializeWorkspaceButtons();
     activeWorkspace();
     update();
     hyprland.connect("notify::workspaces", () => {
+        initializeWorkspaceButtons();
         activeWorkspace();
         update();
     });

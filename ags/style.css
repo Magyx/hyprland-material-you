@@ -116,9 +116,9 @@ separator {
     padding-right: 4px;
 }
 
-.workspaces * {
+/* .workspaces * {
     transition: all 0.35s ease-in-out;
-}
+} */
 
 .workspaces button {
     padding: 0px 5px;
