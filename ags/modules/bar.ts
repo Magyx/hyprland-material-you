@@ -636,7 +636,6 @@ export const BarCornerBottomRight = (monitor = 0) => {
 hyprland.connect("event", (_, name) => {
     if (name === "configreloaded") {
         const r = GetHyprOptions();
-        print("Updating r: " + r);
-        updateCornerWidgets(r);
+                updateCornerWidgets(r);
     }
 })
