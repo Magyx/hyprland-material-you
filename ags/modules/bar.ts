@@ -107,7 +107,7 @@ function Workspaces() {
     function createWorkspaceButton(id: Number) {
         return Widget.Button({
             on_clicked: () => dispatch(`${id}`),
-            child: Widget.Label(`${id}`),
+            child: Widget.Label("•"),
             attribute: { id: id },
             class_name: "workspace"
         });
@@ -522,7 +522,7 @@ function Left() {
         class_name: "modules-left",
         hpack: "start",
         spacing: 8,
-        children: [AppLauncher(), MediaPlayer(), TaskBar()]
+        children: [AppLauncher(), MediaPlayer(), Workspaces(), TaskBar()]
     });
 }
 
@@ -531,7 +531,7 @@ function Center() {
         class_name: "modules-center",
         hpack: "center",
         spacing: 8,
-        children: [Workspaces()]
+        children: []
     });
 }
 
@@ -650,6 +650,6 @@ export const BarCornerBottomRight = (monitor = 0) => {
 hyprland.connect("event", (_, name) => {
     if (name === "configreloaded") {
         const r = GetHyprOptions();
-                updateCornerWidgets(r);
+        updateCornerWidgets(r);
     }
 })
