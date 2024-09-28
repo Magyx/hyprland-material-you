@@ -599,6 +599,40 @@ export const BarCornerTopRight = (monitor = 0) => {
     return widget;
 }
 
+export const BarCornerBottomLeft = (monitor = 0) => {
+    const widget = Widget.Window({
+        monitor,
+        name: `bar_corner_bl${monitor}`,
+        class_name: "transparent",
+        layer: "top",
+        anchor: ["bottom", "left"],
+        exclusivity: "normal",
+        visible: true,
+        child: RoundedCorner("bottom_left", { className: "corner" }),
+        setup: enable_click_through
+    });
+
+    storeCornerWidget(monitor, "bottom_left", widget);
+    return widget;
+}
+
+export const BarCornerBottomRight = (monitor = 0) => {
+    const widget = Widget.Window({
+        monitor,
+        name: `bar_corner_br${monitor}`,
+        class_name: "transparent",
+        layer: "top",
+        anchor: ["bottom", "right"],
+        exclusivity: "normal",
+        visible: true,
+        child: RoundedCorner("bottom_right", { className: "corner" }),
+        setup: enable_click_through
+    });
+
+    storeCornerWidget(monitor, "bottom_right", widget);
+    return widget;
+}
+
 hyprland.connect("event", (_, name) => {
     if (name === "configreloaded") {
         const r = GetHyprOptions();
