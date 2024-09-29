@@ -2,3 +2,4 @@
 /pkg/
 /src/
 /microtex-git*
+*.pkg.tar.zst
