@@ -1,0 +1,24 @@
+[pyprland]
+plugins = ["scratchpads", "workspaces_follow_focus"]
+
+[scratchpads.up-term]
+command = '$TERMINAL --class scratch-term-top -e $HOME/.config/hypr/scripts/scratch/term-top.sh'
+class = "scratch-term-top"
+animation = "fromTop"
+unfocus = "hide"
+position = "33% 25%"
+margin = 0
+size = "33% 50%"
+multi = false
+lazy = true
+
+# [scratchpads.discord]
+# command = "vesktop"
+# class = "vesktop"
+# animation = "fromRight"
+# unfocus = "hide"
+# position = "66% 0%"
+# margin = 0
+# size = "33% 100%"
+# multi = false
+# lazy = true
