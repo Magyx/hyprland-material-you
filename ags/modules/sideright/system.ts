@@ -52,7 +52,8 @@ Utils.interval(1000, async () => {
         if (sideright?.visible) {
             SystemInfo().then((result) => {
                 usage.setValue(result);
-            });
+            })
+            .catch();
         }
     });
 });
