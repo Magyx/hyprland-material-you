@@ -310,7 +310,13 @@ function AppLauncher() {
         on_clicked: () => {
             toggleAppsWindow();
         },
-        child: MaterialIcon("search")
+        child: MaterialIcon("search"),
+        setup: (self) => {
+            self.hook(config, () => {
+                if (config.config.hide_applauncher_button != !self.is_visible())
+                    self.set_visible(!config.config.hide_applauncher_button);
+            });
+        }
     });
 
     return button;
@@ -392,16 +398,23 @@ function MediaPlayer() {
         child: MaterialIcon("play_circle"),
         visible: false,
         tooltip_text: "Unknown"
-    }).hook(mpris, (self) => {
-        if (mpris.players.length > 0) {
-            self.visible = true;
-            metadata = mpris.players[0]?.metadata;
-            if (metadata) self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
-        } else {
-            self.visible = false;
-            self.tooltip_text = "Unknown";
-        }
-    });
+    })
+        .hook(mpris, (self) => {
+            if (mpris.players.length > 0) {
+                self.visible = !config.config.hide_media_button && true;
+                metadata = mpris.players[0]?.metadata;
+                if (metadata) self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
+            } else {
+                self.visible = false;
+                self.tooltip_text = "Unknown";
+            }
+        })
+        .hook(config, (self) => {
+            if (mpris.players.length > 0) {
+                if (config.config.hide_media_button != !self.is_visible())
+                    self.set_visible(!config.config.hide_media_button);
+            }
+        });
 
     return button;
 }
@@ -439,8 +452,15 @@ function TaskBar() {
     let globalWidgets: Button<Icon<any>, any>[] = [];
 
     function Clients(clients: Client[]) {
-        const currentClientIds = clients.map((client) => client.pid);
-        globalWidgets = globalWidgets.filter((widget) => currentClientIds.includes(widget.attribute.pid));
+        const currentClientIds = clients.map((client) => client.address);
+        globalWidgets = globalWidgets.filter((widget) => currentClientIds.includes(widget.attribute.client.address));
+
+        globalWidgets.sort((a, b) => {
+            if (a.attribute.pid == b.attribute.pid) {
+                return a.attribute.workspace - b.attribute.workspace;
+            }
+            return a.attribute.pid - b.attribute.pid;
+        });
 
         clients.forEach((client) => {
             const terminal = GLib.getenv("TERMINAL");
@@ -450,7 +470,7 @@ function TaskBar() {
 
             if (client.class.startsWith("scratch")) return;
 
-            let widget = globalWidgets.find((w) => w.attribute.pid === client.pid);
+            let widget = globalWidgets.find((w) => w.attribute.client.address === client.address);
             if (widget) {
                 widget.tooltip_markup = client.title;
             } else {
@@ -467,7 +487,11 @@ function TaskBar() {
                 }
 
                 widget = Widget.Button({
-                    attribute: { pid: client.pid },
+                    attribute: {
+                        client: client,
+                        workspace: client.workspace,
+                        pid: client.pid
+                    },
                     child: Widget.Icon({ icon }),
                     tooltip_markup: client.title,
                     on_clicked: () => focus(client)
@@ -532,17 +556,22 @@ const Dot = () =>
     });
 
 function Left(monitor: number) {
+    const workspaces = config.config.workspaces_to_the_left ? Workspaces(monitor) : undefined;
+
     // @ts-expect-error
     return Widget.Box({
         // margin_left: 15,
         class_name: "modules_left",
         hpack: "start",
         spacing: 8,
-        children: [AppLauncher(), MediaPlayer(), Workspaces(monitor), TaskBar()]
+        children: [AppLauncher(), OpenSideLeft(), MediaPlayer(), workspaces, TaskBar()]
     });
 }
 
 function Center(monitor: number) {
+    const workspaces = !config.config.workspaces_to_the_left ? Workspaces(monitor) : undefined;
+
+    // @ts-expect-error
     return Widget.Box({
         class_name: "modules_center",
         hpack: "center",
