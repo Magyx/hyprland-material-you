@@ -61,13 +61,12 @@ const list = Widget.Box({
 });
 
 function repopulate() {
-    applications = query("").map(AppItem);
-    applications = sortApplicationsByLaunchCount(applications);
+    applications = applications_service.query("").map(AppItem(repopulate));
     list.children = applications;
 }
 
 export function reloadApplications() {
-    reload();
+    applications_service.reload();
     repopulate();
 }
 
@@ -91,22 +90,12 @@ export const Applauncher = () => {
             })
     });
 
-    function reload() {
-        applications_service.reload();
-        repopulate();
-    }
-
-    function repopulate() {
-        applications = applications_service.query("").map(AppItem(repopulate));
-        list.children = applications;
-    }
-
     const menu = Widget.Menu({
         children: [
             Widget.MenuItem({
                 label: "Reload apps",
                 on_activate: (self) => {
-                    reload();
+                    reloadApplications();
                 }
             })
         ]

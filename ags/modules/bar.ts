@@ -579,7 +579,7 @@ function Center(monitor: number) {
         class_name: "modules_center",
         hpack: "center",
         spacing: 8,
-        children: []
+        children: [workspaces]
     });
 }
 
