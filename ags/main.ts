@@ -24,11 +24,11 @@ const GLib = imports.gi.GLib;
 
 const range = (length: number, start = 1) => Array.from({ length }, (_, i) => i + start);
 function forMonitors(widget: (index: number) => Window<any, any>): Window<any, any>[] {
-    const n = Gdk.Display.get_default()?.get_n_monitors() || 1;
+    const n = Gdk.Display.get_default()?.get_n_monitors() || 0;
     return range(n, 0).map(widget).flat(1);
 }
 function forMonitorsAsync(widget: (index: number) => Promise<Window<any, any>>) {
-    const n = Gdk.Display.get_default()?.get_n_monitors() || 1;
+    const n = Gdk.Display.get_default()?.get_n_monitors() || 0;
     return range(n, 0).forEach((n) => widget(n).catch(print));
 }
 

@@ -530,7 +530,7 @@ const Dot = () =>
         css: "font-weight: 900;"
     });
 
-function Left() {
+function Left(monitor: number) {
     // @ts-expect-error
     return Widget.Box({
         // margin_left: 15,
@@ -541,7 +541,7 @@ function Left() {
     });
 }
 
-function Center() {
+function Center(monitor: number) {
     return Widget.Box({
         class_name: "modules_center",
         hpack: "center",
@@ -550,7 +550,7 @@ function Center() {
     });
 }
 
-function Right() {
+function Right(monitor: number) {
     return Widget.Box({
         // margin_right: 15,
         class_name: "modules_right",
@@ -568,9 +568,9 @@ export const Bar = async (monitor = 0) => {
         anchor: ["top", "left", "right"],
         exclusivity: "exclusive",
         child: Widget.CenterBox({
-            start_widget: Left(),
-            center_widget: Center(),
-            end_widget: Right()
+            start_widget: Left(monitor),
+            center_widget: Center(monitor),
+            end_widget: Right(monitor)
         })
     });
 };
