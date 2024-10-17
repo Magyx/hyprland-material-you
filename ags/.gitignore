@@ -1,3 +1,6 @@
-.vscode/*
+.vscode/
 README.md
 tsconfig.json
+package.json
+node_modules/
+bun.lockb
