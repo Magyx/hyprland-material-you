@@ -102,7 +102,7 @@ function getIconNameFromClass(windowClass: string) {
 
 const dispatch = (ws: string) => hyprland.messageAsync(`dispatch workspace ${ws}`).catch(print);
 
-function Workspaces() {
+function Workspaces(monitor: number) {
     let workspace_buttons = new Map<Number, ReturnType<typeof createWorkspaceButton>>();
     const workspace_buttons_array: VariableType<Button<any, any>[] | any> = Variable([]);
 
@@ -118,9 +118,10 @@ function Workspaces() {
     function initializeWorkspaceButtons() {
         disposeWorkspaceButtons(); // Dispose existing buttons before reinitializing
 
-        const workspaceIds = hyprland.workspaces.map(workspace => workspace.id);
-        const minId = 1;
-        const maxId = Math.max(...workspaceIds);
+        const minId = monitor * 10 + 1;
+        let maxId = minId + 10;
+        const workspaceIds = hyprland.workspaces.map(workspace => workspace.id).filter(id => id < maxId);
+        maxId = Math.max(...workspaceIds);
 
         for (let i = minId; i <= maxId; i++) {
             workspace_buttons.set(i, createWorkspaceButton(i));
@@ -537,7 +538,7 @@ function Left(monitor: number) {
         class_name: "modules_left",
         hpack: "start",
         spacing: 8,
-        children: [AppLauncher(), MediaPlayer(), Workspaces(), TaskBar()]
+        children: [AppLauncher(), MediaPlayer(), Workspaces(monitor), TaskBar()]
     });
 }
 
