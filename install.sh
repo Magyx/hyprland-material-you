@@ -78,8 +78,7 @@ install_yay() {
 }
 
 install_microtex() {
-    cd ~/dotfiles/setup/MicroTex/
-    execute_command makepkg -si
+    execute_command yay -S microtex-git
 }
 
 install_packages() {
@@ -89,7 +88,7 @@ install_packages() {
     execute_command yay -S --needed \
         hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker hyprlock \
         hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
-        xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
+        xdg-desktop-portal-gtk xdg-desktop-portal-hyprland pyprland xdg-user-dirs \
         xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow \
         greetd nm-connection-editor network-manager-applet networkmanager \
@@ -102,7 +101,12 @@ install_packages() {
         ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
         fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake \
         python-materialyoucolor-git gtksourceview3 gtksourceviewmm cairomm \
-        gtkmm3 tinyxml2 python-requests python-numpy
+        gtkmm3 tinyxml2 python-requests python-numpy tmux
+    execute_command hyprpm update --no-shallow && \
+	hyprpm add https://github.com/KZDKM/Hyprspace && \
+	hyprpm add https://github.com/shezdy/hyprsplit && \
+	hyprpm enable Hyprspace && \
+	hyprpm enable hyprsplit
 }
 
 setup_yay() {
