@@ -445,13 +445,16 @@ function OpenSideBar() {
 
 const focus = ({ address }) => Utils.execAsync(`hyprctl dispatch focuswindow address:${address}`).catch(print);
 
-function TaskBar() {
+function TaskBar(monitor: number) {
     if (!config.config.show_taskbar) {
         return undefined;
     }
     let globalWidgets: Button<Icon<any>, any>[] = [];
+    const minId = monitor * 10 + 1;
+    let maxId = minId + 10;
 
     function Clients(clients: Client[]) {
+        clients = clients.filter(client => minId <= client.workspace.id && client.workspace.id < maxId);
         const currentClientIds = clients.map((client) => client.address);
         globalWidgets = globalWidgets.filter((widget) => currentClientIds.includes(widget.attribute.client.address));
 
@@ -564,7 +567,7 @@ function Left(monitor: number) {
         class_name: "modules_left",
         hpack: "start",
         spacing: 8,
-        children: [AppLauncher(), OpenSideLeft(), MediaPlayer(), workspaces, TaskBar()]
+        children: [AppLauncher(), OpenSideLeft(), MediaPlayer(), workspaces, TaskBar(monitor)]
     });
 }
 
